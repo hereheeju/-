@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>경복궁 야경 문화유산 탐방 앱 - STEP 03</title>
+
+  <!-- jQuery Mobile 1.4.5 CSS -->
+  <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+  <link rel="stylesheet" href="경복궁앱/style.css">
+
+  <!-- jQuery 1.11.1 → jQuery Mobile 1.4.5 순서로 로드 -->
+  <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+  <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+  <style>
+    :root {
+      --night-sky: #090e1a;
+      --night-surface: #111a2e;
+      --night-card: #16223b;
+      --night-elevated: #1e2d4d;
+      --night-line: rgba(232, 184, 109, 0.24);
+      --gold-light: #f5d79c;
+      --gold-warm: #e3b05c;
+      --jade-night: #5ec2b0;
+      --ink-bright: #f2f4f8;
+      --ink-muted: #a7b3c9;
+      --footer-bg: #070b14;
+    }
+
+    /* ---------- 공통 (서울 야경 테마) ---------- */
+    .ui-page-theme-a,
+    .ui-page-theme-a .ui-content,
+    .ui-page-theme-b,
+    .ui-page-theme-b .ui-content {
+      background: radial-gradient(circle at top center, #152340 0%, var(--night-sky) 62%, #060911 100%);
+      color: var(--ink-bright);
+    }
+
+    .ui-page-theme-a,
+    .ui-page-theme-a .ui-btn,
+    .ui-page-theme-a .ui-body-a,
+    .ui-page-theme-a input,
+    .ui-page-theme-a button,
+    .ui-page-theme-b,
+    .ui-page-theme-b .ui-btn,
+    .ui-page-theme-b .ui-body-b {
+      font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      text-shadow: none;
+    }
+
+    .ui-header.ui-bar-inherit {
+      background: rgba(10, 17, 32, 0.92);
+      border-bottom: 1px solid var(--night-line);
+      color: var(--gold-light);
+      backdrop-filter: blur(8px);
+    }
+    .ui-header .ui-title {
+      margin: 0;
+      padding: 1.1em 1em;
+      font-size: 1.12em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--gold-light);
+      text-shadow: none;
+    }
+    .ui-header .ui-btn {
+      background: transparent;
+      border: 0;
+      color: var(--gold-light);
+      text-shadow: none;
+    }
+
+    .ui-footer.ui-bar-inherit {
+      background: var(--footer-bg);
+      border-top: 1px solid rgba(232, 184, 109, 0.16);
+      color: var(--ink-muted);
+      text-align: center;
+      padding: 1.1em 1em;
+      font-size: 0.8em;
+      font-weight: 600;
+    }
+    .ui-footer p {
+      margin: 0;
+    }
+
+    /* ---------- 홈 ---------- */
+    .hero {
+      position: relative;
+      height: 220px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--night-line);
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55);
+      background: linear-gradient(180deg, #192b4f 0%, #0b1220 100%);
+    }
+    .hero img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.76) contrast(1.06) saturate(1.1);
+    }
+    .hero-caption {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 2.5em 1.15em 1em;
+      color: var(--ink-bright);
+      background: linear-gradient(
+        to top,
+        rgba(6, 10, 19, 0.92) 0%,
+        rgba(9, 16, 30, 0.65) 58%,
+        rgba(9, 16, 30, 0) 100%
+      );
+    }
+    .hero-caption h2 {
+      margin: 0 0 0.3em;
+      font-size: 1.15em;
+      font-weight: 700;
+      color: var(--gold-light);
+    }
+    .hero-caption p {
+      margin: 0;
+      font-size: 0.84em;
+      color: #dce3f0;
+      opacity: 0.95;
+    }
+
+    .lead {
+      margin: 1.35em 0 1.1em;
+      font-size: 0.88em;
+      line-height: 1.7;
+      color: var(--ink-muted);
+    }
+
+    .menu-list {
+      margin: 0 0 1em;
+    }
+    .menu-list > li {
+      border: 0;
+      margin-bottom: 0.65em;
+    }
+    .menu-list > li > a.ui-btn {
+      padding: 1.08em 1.1em;
+      background: var(--night-card);
+      border: 1px solid var(--night-line);
+      border-radius: 10px;
+      color: var(--ink-bright);
+      font-size: 1.02em;
+      font-weight: 700;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.32);
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+    .menu-list > li > a.ui-btn:hover,
+    .menu-list > li > a.ui-btn:focus {
+      background: var(--night-elevated);
+      border-color: var(--gold-warm);
+      color: var(--gold-light);
+    }
+
+    .step-card {
+      margin-top: 0.9em;
+      padding: 1.1em 1.05em 1.25em;
+      background: var(--night-card);
+      border: 1px solid var(--night-line);
+      border-radius: 10px;
+    }
+    .step-badge {
+      display: inline-block;
+      padding: 0.28em 0.9em;
+      border-radius: 999px;
+      background: rgba(227, 176, 92, 0.16);
+      border: 1px solid rgba(227, 176, 92, 0.45);
+      color: var(--gold-light);
+      font-size: 0.78em;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .step-card p {
+      margin: 1.2em 0 0;
+      font-size: 0.86em;
+      line-height: 1.65;
+      color: var(--ink-muted);
+    }
+
+    /* ---------- 궁궐 소개 ---------- */
+    .intro-title {
+      margin: 0.2em 0 0.4em;
+      font-size: 1.28em;
+      color: var(--gold-light);
+    }
+    .intro-sub {
+      margin: 0 0 1.2em;
+      font-size: 0.88em;
+      line-height: 1.7;
+      color: var(--ink-muted);
+    }
+
+    .ui-collapsible-set {
+      margin: 0;
+    }
+    .ui-collapsible-set .ui-collapsible {
+      margin: 0 0 0.75em;
+    }
+    .ui-collapsible-set .ui-collapsible-heading-toggle {
+      background: var(--night-card);
+      border: 1px solid var(--night-line);
+      border-radius: 10px;
+      color: var(--ink-bright);
+      font-weight: 700;
+      padding: 1em 1em 1em 2.6em;
+    }
+    .ui-collapsible-set .ui-collapsible:not(.ui-collapsible-collapsed) > .ui-collapsible-heading > .ui-collapsible-heading-toggle {
+      background: linear-gradient(90deg, rgba(227, 176, 92, 0.22), rgba(94, 194, 176, 0.14));
+      border-color: var(--gold-warm);
+      color: var(--gold-light);
+      border-radius: 10px 10px 0 0;
+    }
+    .ui-collapsible-set .ui-collapsible-content {
+      background: var(--night-surface);
+      border: 1px solid var(--night-line);
+      border-top: 0;
+      border-radius: 0 0 10px 10px;
+      padding: 0.95em 1.15em 1.15em;
+      font-size: 0.9em;
+      line-height: 1.75;
+      color: var(--ink-bright);
+    }
+    .ui-collapsible-content p {
+      margin: 0 0 0.7em;
+    }
+    .ui-collapsible-content p:last-child {
+      margin-bottom: 0;
+    }
+    .ui-collapsible-content ul {
+      margin: 0;
+      padding-left: 1.2em;
+    }
+    .ui-collapsible-content li {
+      margin-bottom: 0.45em;
+    }
+    .ui-collapsible-content li:last-child {
+      margin-bottom: 0;
+    }
+    .ui-collapsible-content strong {
+      color: var(--gold-light);
+    }
+
+    /* ---------- STEP 02: 영상 / 음악 / 안내 ---------- */
+    .page-title {
+      margin: 0.2em 0 0.7em;
+      text-align: center;
+      font-size: 1.45em;
+      color: var(--gold-light);
+    }
+    .note-box {
+      margin: 0 0 1.1em;
+      padding: 0.85em 1em;
+      border-left: 3px solid var(--gold-warm);
+      background: rgba(227, 176, 92, 0.12);
+      border-radius: 0 8px 8px 0;
+      color: var(--gold-light);
+      font-weight: 700;
+      font-size: 0.92em;
+    }
+    .section-label {
+      margin: 1.3em 0 0.55em;
+      font-size: 0.95em;
+      font-weight: 700;
+      color: var(--jade-night);
+    }
+
+    .video-wrap {
+      position: relative;
+      padding-top: 56.25%;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--night-line);
+      background: #050811;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+    }
+    .video-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    video.local-video {
+      display: block;
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--night-line);
+      background: #050811;
+    }
+
+    audio {
+      display: block;
+      width: 100%;
+      margin: 0 0 1em;
+      border-radius: 8px;
+      filter: invert(0.92) hue-rotate(180deg);
+    }
+    .cover {
+      display: block;
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--night-line);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+    }
+    .caption {
+      margin: 0.8em 0 1em;
+      font-size: 0.82em;
+      line-height: 1.65;
+      color: var(--ink-muted);
+    }
+
+    .help-link {
+      display: inline-block;
+      margin: 0.2em 0 0.8em;
+      font-size: 0.84em;
+      font-weight: 600;
+      color: var(--gold-light);
+      text-decoration: underline;
+    }
+
+    .nav-row {
+      display: flex;
+      gap: 0.65em;
+      margin-top: 1.1em;
+    }
+    .nav-row .ui-btn {
+      flex: 1;
+      margin: 0;
+      padding: 0.92em 0.5em;
+      background: linear-gradient(135deg, #c9943e 0%, #9f6d24 100%);
+      border: 1px solid rgba(245, 215, 156, 0.35);
+      border-radius: 8px;
+      color: #090e1a;
+      font-size: 0.98em;
+      font-weight: 700;
+      text-shadow: none;
+    }
+    .nav-row .ui-btn:hover {
+      background: linear-gradient(135deg, #deb062 0%, #b57e2e 100%);
+      color: #060911;
+    }
+
+    /* 안내 다이얼로그 */
+    #media-help .ui-content {
+      background: var(--night-surface);
+      color: var(--ink-bright);
+    }
+    #media-help ul {
+      margin: 0 0 1.2em;
+      padding-left: 1.2em;
+      font-size: 0.9em;
+      line-height: 1.75;
+    }
+    #media-help li {
+      margin-bottom: 0.45em;
+    }
+    #media-help .ui-btn {
+      background: var(--gold-warm);
+      border: 0;
+      border-radius: 8px;
+      color: #090e1a;
+      font-weight: 700;
+      text-shadow: none;
+    }
+
+    /* ---------- STEP 03: 갤러리 / 팝업 ---------- */
+    .home-btn.ui-btn {
+      background: rgba(227, 176, 92, 0.18);
+      border: 1px solid rgba(227, 176, 92, 0.45);
+      border-radius: 6px;
+      color: var(--gold-light);
+      font-size: 0.8em;
+      font-weight: 700;
+      padding: 0.65em 0.95em;
+      margin-top: 0.85em;
+    }
+    .gallery-lead {
+      margin: 0.4em 0 1em;
+      font-size: 0.88em;
+      line-height: 1.7;
+      color: var(--ink-muted);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65em;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .gallery-item,
+    .gallery-item:hover,
+    .gallery-item:focus {
+      display: block;
+      overflow: hidden;
+      background: var(--night-card);
+      border: 1px solid var(--night-line);
+      border-radius: 10px;
+      color: var(--ink-bright);
+      text-decoration: none;
+      text-shadow: none;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    }
+    .gallery-thumb {
+      overflow: hidden;
+      aspect-ratio: 4 / 3;
+      background: linear-gradient(180deg, #1b2d52 0%, #0b1222 100%);
+    }
+    .gallery-thumb img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.84) contrast(1.05);
+      transition: transform 0.35s ease, filter 0.35s ease;
+    }
+    .gallery-caption {
+      display: block;
+      padding: 0.8em 0.9em;
+      font-size: 0.82em;
+      font-weight: 700;
+      color: var(--gold-light);
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    @media (hover: hover) {
+      .gallery-item:hover {
+        border-color: var(--gold-warm);
+      }
+      .gallery-item:hover .gallery-thumb img {
+        transform: scale(1.07);
+        filter: brightness(1.04) contrast(1.06);
+      }
+      .gallery-item:hover .gallery-caption {
+        background: rgba(227, 176, 92, 0.16);
+        color: #fff0cc;
+      }
+    }
+    .gallery-item:focus-visible {
+      outline: 3px solid var(--gold-warm);
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .gallery-thumb img,
+      .gallery-caption {
+        transition: none;
+      }
+      .gallery-item:hover .gallery-thumb img {
+        transform: none;
+      }
+    }
+
+    #photoPopup {
+      background: var(--night-surface);
+      border: 1px solid var(--night-line);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.75);
+    }
+    #photoPopup .popup-body {
+      padding: 2.6em 0.85em 0.95em;
+      text-align: center;
+    }
+    #photoPopup .popup-img {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+      border-radius: 8px;
+      background: #080d18;
+    }
+    #photoPopup .popup-caption {
+      margin: 0.85em 0 0;
+      font-size: 1.02em;
+      font-weight: 700;
+      color: var(--gold-light);
+    }
+  </style>
+
+  <script>
+    (function ($) {
+      // 페이지 안의 audio, video, 유튜브 iframe을 모두 일시정지
+      function pauseMedia($scope) {
+        $scope.find("audio, video").each(function () {
+          try { this.pause(); } catch (e) {}
+        });
+        $scope.find("iframe[data-youtube]").each(function () {
+          if (this.contentWindow) {
+            this.contentWindow.postMessage(
+              JSON.stringify({ event: "command", func: "pauseVideo", args: [] }), "*"
+            );
+          }
+        });
+      }
+
+      // 페이지가 숨겨지기 직전, 떠나는 페이지의 미디어를 정지 (다이얼로그를 열 때도 동작)
+      $(document).on("pagecontainerbeforehide", function (event, ui) {
+        var $leaving = (ui && ui.prevPage && ui.prevPage.length)
+          ? ui.prevPage
+          : $(":mobile-pagecontainer").pagecontainer("getActivePage");
+        if ($leaving && $leaving.length) { pauseMedia($leaving); }
+      });
+
+      // 새 미디어를 재생하면 다른 audio/video는 멈춤 (play 이벤트는 버블링되지 않아 캡처링 사용)
+      document.addEventListener("play", function (event) {
+        $("audio, video").not(event.target).each(function () { this.pause(); });
+      }, true);
+    })(jQuery);
+
+    // ---------- 갤러리: 이벤트 위임으로 팝업 열기 ----------
+    (function ($) {
+      $(document).on("click", "#gallery .gallery-item", function (event) {
+        event.preventDefault();
+        var $item = $(this);
+        var $popup = $("#photoPopup");
+        var $img = $popup.find(".popup-img");
+
+        $img.off("load.gallery").on("load.gallery", function () {
+          if ($popup.parent().hasClass("ui-popup-active")) {
+            $popup.popup("reposition", { positionTo: "window" });
+          }
+        });
+        $img.attr({
+          src: $item.attr("href"),
+          alt: $item.data("name") + " 원본 이미지"
+        });
+        $popup.find(".popup-caption").text($item.data("caption"));
+        $popup.popup("open");
+      });
+
+      // 팝업 이미지가 화면 밖으로 나가지 않도록 크기 제한
+      $(document).on("popupbeforeposition", "#photoPopup", function () {
+        var maxH = $(window).height() - 170;
+        var maxW = $(window).width() - 50;
+        $(this).find(".popup-img").css({ "max-height": maxH, "max-width": maxW });
+      });
+
+      // 팝업이 닫히면 이미지를 비워 다음 열기 때 이전 사진이 깜빡이지 않게 함
+      $(document).on("popupafterclose", "#photoPopup", function () {
+        $(this).find(".popup-img").removeAttr("src");
+      });
+    })(jQuery);
+  </script>
+</head>
+<body>
+
+  <!-- ========== 홈 ========== -->
+  <div data-role="page" id="home" data-theme="a">
+    <div data-role="header">
+      <h1>경복궁 야경 문화유산 탐방 앱</h1>
+    </div>
+
+    <div role="main" class="ui-content">
+      <div class="hero">
+        <img src="images/scene-01.jpg" alt="서울 야경 속 경복궁 전경 이미지">
+        <div class="hero-caption">
+          <h2>밤빛으로 만나는 서울의 궁궐</h2>
+          <p>조명과 고궁의 정취를 담은 jQuery Mobile 야경 탐방</p>
+        </div>
+      </div>
+
+      <p class="lead">목록에서 탐방할 야경 콘텐츠를 선택하세요. 어두운 화면에서도 읽기 편한 야간 모드로 구성했습니다.</p>
+
+      <ul data-role="listview" class="menu-list">
+        <li><a href="#intro" data-transition="slide">궁궐 소개</a></li>
+        <li><a href="#movie" data-transition="slide">경복궁 야경 영상</a></li>
+        <li><a href="#music1" data-transition="slide">궁궐 테마 음악 ①</a></li>
+        <li><a href="#music2" data-transition="slide">궁궐 테마 음악 ②</a></li>
+        <li><a href="#gallery" data-transition="slide">경복궁 야경 갤러리</a></li>
+      </ul>
+
+      <div class="step-card">
+        <span class="step-badge">STEP 03 · NIGHT MODE</span>
+        <p>사진 갤러리 · 팝업 · 이벤트 위임으로 야경 탐방 앱을 완성합니다.</p>
+      </div>
+    </div>
+
+    <div data-role="footer">
+      <p>경복궁 야경 문화유산 탐방 · jQuery Mobile 3단계 실습</p>
+    </div>
+  </div>
+
+  <!-- ========== 궁궐 소개 ========== -->
+  <div data-role="page" id="intro" data-theme="a">
+    <div data-role="header">
+      <a href="#home" data-rel="back" data-direction="reverse" data-icon="carat-l" data-iconpos="notext" class="ui-btn-left">홈으로</a>
+      <h1>궁궐 소개</h1>
+    </div>
+
+    <div role="main" class="ui-content">
+      <h2 class="intro-title">경복궁의 밤</h2>
+      <p class="intro-sub">조선의 법궁(法宮) 경복궁은 밤이 되면 은은한 조명과 수면 반영이 어우러져 낮과는 다른 깊이를 전합니다.</p>
+
+      <div data-role="collapsible-set" data-inset="true">
+        <div data-role="collapsible" data-collapsed="false">
+          <h3>역사</h3>
+          <ul>
+            <li><strong>1395년</strong> 태조 이성계가 한양 천도 후 가장 먼저 지은 궁궐입니다.</li>
+            <li><strong>임진왜란</strong> 때 대부분의 건물이 불에 타 약 270년간 빈터로 남았습니다.</li>
+            <li><strong>1867년</strong> 고종 때 흥선대원군의 주도로 다시 지어졌습니다.</li>
+            <li>일제강점기에 많은 건물이 훼손되었고, 현재 복원 사업이 이어지고 있습니다.</li>
+          </ul>
+        </div>
+
+        <div data-role="collapsible">
+          <h3>야경 명소</h3>
+          <ul>
+            <li><strong>광화문</strong> 경복궁의 정문으로, 야간 조명 아래 웅장한 석축과 현판이 돋보입니다.</li>
+            <li><strong>근정전</strong> 왕의 즉위식과 큰 행사가 열리던 정전으로, 밤하늘과 대비되는 기품이 있습니다.</li>
+            <li><strong>경회루</strong> 연못 위에 세운 누각으로, 수면에 비친 불빛과 누각 반영이 유명합니다.</li>
+            <li><strong>향원정</strong> 연못 가운데 섬에 세운 정자로, 고요한 밤의 운치를 전해 줍니다.</li>
+          </ul>
+        </div>
+
+        <div data-role="collapsible">
+          <h3>야간 관람 예절</h3>
+          <ul>
+            <li>어두운 구간이 많으므로 지정된 산책로와 계단 이동 시 발밑을 주의합니다.</li>
+            <li>건물 기둥, 담장, 석조물은 손으로 만지거나 기대지 않습니다.</li>
+            <li>다른 관람객을 위해 차분히 관람하고 쓰레기는 되가져갑니다.</li>
+            <li>야간 개장 일정과 예매·관람 시간은 방문 전 공식 안내를 확인하세요.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div data-role="footer">
+      <p>경복궁 야경 문화유산 탐방 · jQuery Mobile 3단계 실습</p>
+    </div>
+  </div>
+
+  <!-- ========== 영상 ========== -->
+  <div data-role="page" id="movie" data-theme="a">
+    <div data-role="header">
+      <a href="#home" data-rel="back" data-direction="reverse" data-icon="carat-l" data-iconpos="notext" class="ui-btn-left">홈으로</a>
+      <h1>경복궁 야경 영상</h1>
+    </div>
+
+    <div role="main" class="ui-content">
+      <h2 class="page-title">경복궁 영상 탐방</h2>
+      <p class="note-box">유튜브와 앱 영상으로 밤의 경복궁 둘러보기</p>
+
+      <p class="section-label">유튜브 영상</p>
+      <div class="video-wrap">
+        <iframe data-youtube
+                src="https://www.youtube.com/embed/yZeNfaIK7Nw?enablejsapi=1&amp;rel=0"
+                title="경복궁 소개 영상"
+                allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+      </div>
+
+      <p class="section-label">앱 내장 영상</p>
+      <video class="local-video" controls preload="metadata" playsinline poster="images/scene-04.jpg">
+        <source src="경복궁앱/경복궁 노래.mp4" type="video/mp4">
+        이 브라우저는 video 태그를 지원하지 않습니다.
+      </video>
+
+      <p class="caption">재생 버튼을 눌러 시작하세요. 다른 화면으로 이동하면 영상이 자동으로 멈춥니다.</p>
+      <a href="#media-help" data-rel="dialog" data-transition="slide" class="help-link">재생 안내 보기</a>
+
+      <div class="nav-row">
+        <a href="#home" data-transition="slide" data-direction="reverse" class="ui-btn ui-corner-all">이전 · 홈</a>
+        <a href="#music1" data-transition="slide" class="ui-btn ui-corner-all">다음 · 음악</a>
+      </div>
+    </div>
+
+    <div data-role="footer">
+      <p>경복궁 야경 문화유산 탐방</p>
+    </div>
+  </div>
+
+  <!-- ========== 음악 1 ========== -->
+  <div data-role="page" id="music1" data-theme="a">
+    <div data-role="header">
+      <a href="#home" data-rel="back" data-direction="reverse" data-icon="carat-l" data-iconpos="notext" class="ui-btn-left">홈으로</a>
+      <h1>경복궁 음악 1</h1>
+    </div>
+
+    <div role="main" class="ui-content">
+      <h2 class="page-title">궁궐 테마 음악 ①</h2>
+      <p class="note-box">밤 산책에 어울리는 첫 번째 연주곡</p>
+
+      <audio controls preload="none">
+        <source src="images/메롱해치.mp3" type="audio/mpeg">
+        이 브라우저는 audio 태그를 지원하지 않습니다.
+      </audio>
+
+      <img class="cover" src="images/scene-03.jpg" alt="연못 위에 세운 경회루 야경 이미지">
+      <p class="caption">경복궁 탐방 분위기를 살려 구성한 음악입니다.</p>
+      <a href="#media-help" data-rel="dialog" data-transition="slide" class="help-link">재생 안내 보기</a>
+
+      <div class="nav-row">
+        <a href="#home" data-transition="slide" data-direction="reverse" class="ui-btn ui-corner-all">이전 · 홈</a>
+        <a href="#music2" data-transition="slide" class="ui-btn ui-corner-all">다음 음악</a>
+      </div>
+    </div>
+
+    <div data-role="footer">
+      <p>경복궁 야경 문화유산 탐방 · jQuery Mobile 3단계 실습</p>
+    </div>
+  </div>
+
+  <!-- ========== 음악 2 ========== -->
+  <div data-role="page" id="music2" data-theme="a">
+    <div data-role="header">
+      <a href="#home" data-rel="back" data-direction="reverse" data-icon="carat-l" data-iconpos="notext" class="ui-btn-left">홈으로</a>
+      <h1>경복궁 음악 2</h1>
+    </div>
+
+    <div role="main" class="ui-content">
+      <h2 class="page-title">궁궐 테마 음악 ②</h2>
+      <p class="note-box">고요한 야경을 위한 두 번째 연주곡</p>
+
+      <audio controls preload="none">
+        <source src="images/palace-melody-2.mp3" type="audio/mpeg">
+        이 브라우저는 audio 태그를 지원하지 않습니다.
+      </audio>
+
+      <img class="cover" src="images/scene-10.jpg" alt="밤하늘 아래 조명을 받은 경복궁 전각 이미지">
+      <p class="caption">실습을 위해 생성한 짧은 창작 연주곡입니다.</p>
+      <a href="#media-help" data-rel="dialog" data-transition="slide" class="help-link">재생 안내 보기</a>
+
+      <div class="nav-row">
+        <a href="#music1" data-transition="slide" data-direction="reverse" class="ui-btn ui-corner-all">이전 음악</a>
+        <a href="#gallery" data-transition="slide" class="ui-btn ui-corner-all">다음 · 갤러리</a>
+      </div>
+    </div>
+
+    <div data-role="footer">
+      <p>경복궁 야경 문화유산 탐방 · jQuery Mobile 3단계 실습</p>
+    </div>
+  </div>
+
+  <!-- ========== 갤러리 ========== -->
+  <div data-role="page" id="gallery" data-theme="a">
+    <div data-role="header">
+      <a href="#home" data-transition="slide" data-direction="reverse" class="ui-btn ui-btn-left ui-btn-inline ui-corner-all home-btn">홈</a>
+      <h1>경복궁 갤러리</h1>
+    </div>
+
+    <div role="main" class="ui-content">
+      <p class="gallery-lead">경복궁 관련 사진을 선택하면 팝업에서 큰 이미지로 확인할 수 있습니다.</p>
+
+      <div class="gallery-grid">
+        <a href="images/scene-01.jpg" class="gallery-item" data-ajax="false" data-name="광화문" data-caption="01 · 광화문">
+          <span class="gallery-thumb"><img src="images/scene-01.jpg" alt="광화문 전경 이미지" loading="lazy"></span>
+          <span class="gallery-caption">01 · 광화문</span>
+        </a>
+        <a href="images/scene-02.jpg" class="gallery-item" data-ajax="false" data-name="근정전" data-caption="02 · 근정전">
+          <span class="gallery-thumb"><img src="images/scene-02.jpg" alt="근정전 전경 이미지" loading="lazy"></span>
+          <span class="gallery-caption">02 · 근정전</span>
+        </a>
+        <a href="images/scene-03.jpg" class="gallery-item" data-ajax="false" data-name="경회루" data-caption="03 · 경회루">
+          <span class="gallery-thumb"><img src="images/scene-03.jpg" alt="연못 위에 세운 경회루 이미지" loading="lazy"></span>
+          <span class="gallery-caption">03 · 경회루</span>
+        </a>
+        <a href="images/scene-04.jpg" class="gallery-item" data-ajax="false" data-name="향원정" data-caption="04 · 향원정">
+          <span class="gallery-thumb"><img src="images/scene-04.jpg" alt="향원정과 연못 이미지" loading="lazy"></span>
+          <span class="gallery-caption">04 · 향원정</span>
+        </a>
+        <a href="images/scene-05.jpg" class="gallery-item" data-ajax="false" data-name="전통 처마" data-caption="05 · 전통 처마">
+          <span class="gallery-thumb"><img src="images/scene-05.jpg" alt="전통 기와와 처마 이미지" loading="lazy"></span>
+          <span class="gallery-caption">05 · 전통 처마</span>
+        </a>
+        <a href="images/scene-06.jpg" class="gallery-item" data-ajax="false" data-name="궁중 의식" data-caption="06 · 궁중 의식">
+          <span class="gallery-thumb"><img src="images/scene-06.jpg" alt="궁중 행사와 의식 이미지" loading="lazy"></span>
+          <span class="gallery-caption">06 · 궁중 의식</span>
+        </a>
+        <a href="images/scene-07.jpg" class="gallery-item" data-ajax="false" data-name="가을 정자" data-caption="07 · 가을 정자">
+          <span class="gallery-thumb"><img src="images/scene-07.jpg" alt="단풍이 물든 정자 이미지" loading="lazy"></span>
+          <span class="gallery-caption">07 · 가을 정자</span>
+        </a>
+        <a href="images/scene-08.jpg" class="gallery-item" data-ajax="false" data-name="겨울 설경" data-caption="08 · 겨울 설경">
+          <span class="gallery-thumb"><img src="images/scene-08.jpg" alt="설경 속 전각과 마당 이미지" loading="lazy"></span>
+          <span class="gallery-caption">08 · 겨울 설경</span>
+        </a>
+        <a href="images/scene-09.jpg" class="gallery-item" data-ajax="false" data-name="봄 누각" data-caption="09 · 봄 누각">
+          <span class="gallery-thumb"><img src="images/scene-09.jpg" alt="벚꽃과 누각 풍경 이미지" loading="lazy"></span>
+          <span class="gallery-caption">09 · 봄 누각</span>
+        </a>
+        <a href="images/scene-10.jpg" class="gallery-item" data-ajax="false" data-name="궁궐 야경" data-caption="10 · 궁궐 야경">
+          <span class="gallery-thumb"><img src="images/scene-10.jpg" alt="밤하늘 아래 야간 조명 전각 이미지" loading="lazy"></span>
+          <span class="gallery-caption">10 · 궁궐 야경</span>
+        </a>
+        <a href="images/scene-11.jpg" class="gallery-item" data-ajax="false" data-name="어좌와 병풍" data-caption="11 · 어좌와 병풍">
+          <span class="gallery-thumb"><img src="images/scene-11.jpg" alt="어좌와 일월오봉도 내부 이미지" loading="lazy"></span>
+          <span class="gallery-caption">11 · 어좌와 병풍</span>
+        </a>
+        <a href="images/scene-12.jpg" class="gallery-item" data-ajax="false" data-name="단청 천장" data-caption="12 · 단청 천장">
+          <span class="gallery-thumb"><img src="images/scene-12.jpg" alt="단청과 목조 천장 구조 이미지" loading="lazy"></span>
+          <span class="gallery-caption">12 · 단청 천장</span>
+        </a>
+      </div>
+    </div>
+
+    <div data-role="footer">
+      <p>경복궁 야경 문화유산 탐방 · jQuery Mobile 3단계 실습</p>
+    </div>
+
+    <!-- 사진 확대 팝업: 갤러리 페이지 안에 두어야 jQuery Mobile이 popup으로 초기화함 -->
+    <div data-role="popup" id="photoPopup" data-overlay-theme="b" data-theme="none"
+         data-corners="false" data-position-to="window" data-transition="fade">
+      <a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">닫기</a>
+      <div class="popup-body">
+        <img class="popup-img" alt="">
+        <p class="popup-caption"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 재생 안내 (dialog) ========== -->
+  <div data-role="page" id="media-help" data-theme="a">
+    <div data-role="header">
+      <h1>재생 안내</h1>
+    </div>
+
+    <div role="main" class="ui-content">
+      <ul>
+        <li>모바일 브라우저는 소리가 나는 미디어를 자동으로 재생하지 않습니다. 재생 버튼을 직접 눌러 주세요.</li>
+        <li>다른 화면으로 이동하거나 이 안내를 열면 재생 중인 영상과 음악이 자동으로 멈춥니다.</li>
+        <li>영상과 음악은 한 번에 하나만 재생됩니다.</li>
+      </ul>
+      <a href="#" data-rel="back" class="ui-btn ui-corner-all">닫기</a>
+    </div>
+  </div>
+
+</body>
+</html>
